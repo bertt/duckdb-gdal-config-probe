@@ -1,0 +1,1 @@
+{"geometryType":"esriGeometryPolygon","spatialReference":{"wkid":4326},"fields":[{"name":"id","type":"esriFieldTypeInteger"}],"features":[{"attributes":{"id":1},"geometry":{"rings":[[[0,0],[0,10],[10,10],[10,0],[0,0]],[[2,2],[8,2],[8,8],[2,8],[2,2]]]}}]}
