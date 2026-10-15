@@ -48,3 +48,27 @@ ogr2ogr -f GPKG layer_default.gpkg "ESRIJSON:https://services-eu1.arcgis.com/SMn
 
 Through DuckDB's `ST_Read` the same layer takes about 145 s either way, because the
 option cannot be applied.
+
+## Proposal
+
+`ST_Read` should accept GDAL config options per call, scoped to that read so they do
+not leak into other reads in the same process:
+
+```sql
+SELECT * FROM ST_Read(
+    'probe.json',
+    config_options = ['OGR_ORGANIZE_POLYGONS=ONLY_CCW']
+);
+```
+
+- Implemented with `CPLSetThreadLocalConfigOption` (set before opening the dataset,
+  restored afterwards), so values apply to that read only.
+- Same syntax as `open_options`, a list of `KEY=VALUE` strings.
+- Alternatively, a connection-level setting, for example
+  `SET gdal_config_options = 'OGR_ORGANIZE_POLYGONS=ONLY_CCW'`, for options such as
+  `GDAL_HTTP_*` that should apply to many reads.
+- Expected result: all four cases in `probe.py` print `OK` once `SKIP` can be passed
+  through `config_options`.
+
+Related: duckdb/duckdb-spatial#527 (`OGR_GEOJSON_MAX_OBJ_SIZE` passed through
+`open_options` has no effect), which is the same limitation.
